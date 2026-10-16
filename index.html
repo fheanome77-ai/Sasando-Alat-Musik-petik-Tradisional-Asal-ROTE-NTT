@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sasando Gong Digital NTT - 11 Dawai Tradisional</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wood: {
+                            100: '#F5EBE1',
+                            300: '#D6C0B3',
+                            600: '#8D6E63',
+                            800: '#4E342E',
+                            900: '#271B17',
+                        },
+                        haik: '#D8B86D',
+                        haikShadow: '#8C6826',
+                        bamboo: '#A68051',
+                        gold: '#E5A93C'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Animasi dan Styling Kustom */
+        body {
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            background: radial-gradient(circle at center, #271B17 0%, #0F0A08 100%);
+        }
+
+        /* Motif Ikat NTT / Ornament BG */
+        .ikat-pattern {
+            background-color: #120b08;
+            background-image: radial-gradient(#8D6E63 0.75px, transparent 0.75px), radial-gradient(#8D6E63 0.75px, #120b08 0.75px);
+            background-size: 28px 28px;
+            background-position: 0 0, 14px 14px;
+            opacity: 0.2;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #180d09;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4E342E;
+            border-radius: 4px;
+        }
+
+        /* String Glow / Animasi Getaran Dawai */
+        .string-line {
+            transition: stroke 0.12s ease, stroke-width 0.1s ease;
+        }
+        .string-active {
+            stroke: #FFD54F !important;
+            stroke-width: 4.5px !important;
+            filter: drop-shadow(0px 0px 12px rgba(255, 213, 79, 0.95));
+        }
+
+        .senda-node {
+            transition: transform 0.15s ease, fill 0.15s ease;
+        }
+        .senda-active {
+            fill: #FFF59D !important;
+            transform: scale(1.3);
+            transform-origin: center;
+        }
+    </style>
+</head>
+<body class="text-wood-100 min-h-screen flex flex-col font-sans overflow-x-hidden relative selection:bg-gold selection:text-black">
+
+    <!-- Latar Belakang Pola Etnik NTT -->
+    <div class="fixed inset-0 ikat-pattern pointer-events-none z-0"></div>
+
+    <!-- Header / Navbar Top -->
+    <header class="relative z-10 bg-wood-900/90 backdrop-blur-md border-b border-wood-800 px-4 py-3 flex justify-between items-center shadow-xl">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-gold via-haik to-wood-600 flex items-center justify-center text-wood-900 font-bold text-xl shadow-lg border border-haik/50">
+                <i class="fa-solid font-serif">S</i>
+            </div>
+            <div>
+                <h1 class="text-lg md:text-xl font-bold tracking-wide text-gold flex items-center gap-2">
+                    Sasando Digital
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-gold/40">Rote</span>
+                </h1>
+                <p class="text-xs text-wood-300 hidden sm:block">Sasando Alat Musik petik Tradisional Asal ROTE-NTT</p>
+            </div>
+        </div>
+
+        <!-- Mode Indicator / Quick Controls -->
+        <div class="flex items-center gap-2">
+            <button id="btn-audio-init" onclick="initAudioEngine()" class="bg-gold hover:bg-yellow-500 text-wood-900 font-bold px-3 py-1.5 rounded-xl text-xs md:text-sm shadow-md transition flex items-center gap-2">
+                <i class="fa-solid fa-volume-high"></i> <span id="audio-status-text">Aktifkan Suara</span>
+            </button>
+            <button onclick="toggleModal('modal-info')" class="p-2 rounded-xl bg-wood-800/80 hover:bg-wood-600 text-wood-300 hover:text-white transition border border-wood-600/50" title="Informasi Sasando Gong">
+                <i class="fa-solid fa-circle-info text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Area Utama Aplikasi -->
+    <main class="relative z-10 flex-1 flex flex-col lg:flex-row gap-4 p-2 sm:p-4 max-w-7xl mx-auto w-full">
+        
+        <!-- Kolom Kiri: Visualizer Sasando Gong (Berdasarkan Gambar) -->
+        <section class="flex-1 bg-wood-900/60 backdrop-blur-md border border-wood-800/90 rounded-2xl p-3 sm:p-5 flex flex-col justify-between shadow-2xl relative overflow-hidden">
+            
+            <!-- Control Bar Atas Instrument -->
+            <div class="flex flex-wrap justify-between items-center gap-2 z-10 mb-2">
+                <div class="flex items-center gap-2 bg-wood-800/80 px-3 py-1 rounded-lg border border-wood-700/60 text-xs">
+                    <span class="font-semibold text-gold"><i class="fa-solid fa-music mr-1"></i> Sistem Nada:</span>
+                    <span class="text-wood-300 font-medium">Pentatonik Rote Gong (11 Dawai)</span>
+                </div>
+
+                <div class="flex items-center gap-3 bg-wood-800/80 px-3 py-1 rounded-full border border-gold/30 text-xs">
+                    <span id="active-note-display" class="font-mono text-gold font-bold">Siap Memetik</span>
+                    <span class="text-wood-600">|</span>
+                    <span id="active-key-hint" class="text-wood-300">Sentuh Dawai / Angka Keyboard [1-9, 0, -]</span>
+                </div>
+            </div>
+
+            <!-- Container SVG Visualisasi Sasando Gong -->
+            <div id="sasando-container" class="relative flex-1 w-full min-h-[420px] sm:min-h-[500px] flex items-center justify-center my-2 select-none touch-none">
+                <!-- SVG Canvas Dinamis dirender via JavaScript sesuai gambar referensi -->
+                <svg id="sasando-svg" class="w-full h-full max-h-[620px] cursor-pointer" viewBox="0 0 920 650" preserveAspectRatio="xMidYMid meet">
+                    <!-- Dynamic SVG Rendered Here -->
+                </svg>
+            </div>
+
+            <!-- Petunjuk Petik Mobile / Shortcut Desktop -->
+            <div class="z-10 text-center text-xs text-wood-300/90 bg-wood-900/90 p-2.5 rounded-xl border border-wood-800 flex justify-center items-center gap-3">
+                <span class="md:hidden"><i class="fa-solid fa-hand-pointer text-gold mr-1"></i> Sentuh atau usap dawai untuk memetik Sasando Gong</span>
+                <span class="hidden md:inline"><i class="fa-solid fa-keyboard text-gold mr-1"></i> Gunakan Tombol: Angka <code class="bg-wood-800 text-gold px-1.5 py-0.5 rounded border border-wood-600">1-9</code>, <code class="bg-wood-800 text-gold px-1.5 py-0.5 rounded border border-wood-600">0</code>, dan <code class="bg-wood-800 text-gold px-1.5 py-0.5 rounded border border-wood-600">-</code></span>
+            </div>
+        </section>
+
+        <!-- Kolom Kanan: Panel Kontrol Pembelajaran & Audio FX -->
+        <aside class="w-full lg:w-80 flex flex-col gap-4">
+            
+            <!-- Panel Mode Pembelajaran Lagu Sasando Gong -->
+            <div class="bg-wood-900/60 backdrop-blur-md border border-wood-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
+                <h2 class="text-base font-bold text-gold flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap"></i> Panduan Lagu Sasando Gong
+                </h2>
+                <p class="text-xs text-wood-300">Pilih melodi lagu tradisional NTT untuk latihan petikan 11 dawai:</p>
+
+                <div id="song-list-container" class="flex flex-col gap-2">
+                    <!-- Dynamic song cards generated via JS -->
+                </div>
+
+                <!-- Kontrol Jalannya Tutorial -->
+                <div id="tutorial-controls" class="hidden flex-col gap-2 mt-2 pt-3 border-t border-wood-800">
+                    <div class="flex justify-between items-center text-xs">
+                        <span id="tutorial-status" class="text-gold font-medium">Langkah 1/10</span>
+                        <button onclick="stopLesson()" class="text-red-400 hover:text-red-300 text-xs font-semibold">Batal</button>
+                    </div>
+                    <div class="w-full bg-wood-800 h-2 rounded-full overflow-hidden border border-wood-700">
+                        <div id="tutorial-progress" class="bg-gradient-to-r from-gold to-yellow-300 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                    <p id="tutorial-next-note" class="text-xs text-center text-wood-300 py-1 font-mono bg-wood-800/50 rounded-lg border border-wood-700">
+                        Petik dawai: <strong class="text-gold font-bold text-sm" id="target-note-name">-</strong>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Panel Pengaturan Karaktristik Suara Resonator -->
+            <div class="bg-wood-900/60 backdrop-blur-md border border-wood-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
+                <h2 class="text-base font-bold text-gold flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> Resonansi Wadah Haik
+                </h2>
+
+                <!-- Control Reverb (Echo Gema Lontar) -->
+                <div class="flex flex-col gap-1">
+                    <div class="flex justify-between text-xs">
+                        <label for="param-reverb" class="text-wood-300">Gema Wadah Lontar (Reverb)</label>
+                        <span id="val-reverb" class="font-mono text-gold">55%</span>
+                    </div>
+                    <input type="range" id="param-reverb" min="0" max="100" value="55" oninput="updateAudioParam('reverb', this.value)" class="accent-gold bg-wood-800 rounded-lg h-2 cursor-pointer">
+                </div>
+
+                <!-- Control Decay / Ketahanan Dengung Dawai -->
+                <div class="flex flex-col gap-1">
+                    <div class="flex justify-between text-xs">
+                        <label for="param-decay" class="text-wood-300">Dengung Kawat (Decay)</label>
+                        <span id="val-decay" class="font-mono text-gold">2.8s</span>
+                    </div>
+                    <input type="range" id="param-decay" min="8" max="60" value="28" oninput="updateAudioParam('decay', this.value)" class="accent-gold bg-wood-800 rounded-lg h-2 cursor-pointer">
+                </div>
+
+                <!-- Control Brightness / Karakter Petikan -->
+                <div class="flex flex-col gap-1">
+                    <div class="flex justify-between text-xs">
+                        <label for="param-brightness" class="text-wood-300">Kejelasan Petikan (Brightness)</label>
+                        <span id="val-brightness" class="font-mono text-gold">3200 Hz</span>
+                    </div>
+                    <input type="range" id="param-brightness" min="1000" max="7000" step="100" value="3200" oninput="updateAudioParam('brightness', this.value)" class="accent-gold bg-wood-800 rounded-lg h-2 cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Informasi Kebudayaan Singkat -->
+            <div class="bg-wood-900/40 border border-wood-800/60 rounded-2xl p-3 text-xs text-wood-300/90 leading-relaxed flex items-start gap-2.5">
+                <i class="fa-solid fa-lightbulb text-gold text-base mt-0.5 shrink-0"></i>
+                <p><strong>Sasando Gong:</strong> Memiliki 11 senar khas Pulau Rote dengan tangga nada pentatonik. Wadah mangkuk lontar (*Haik*) berfungsi memantulkan dan menggemakan getaran dawai kawat.</p>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Modal Informasi & Bantuan -->
+    <div id="modal-info" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-wood-900 border border-gold/50 text-wood-100 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="toggleModal('modal-info')" class="absolute top-4 right-4 text-wood-300 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="text-xl font-bold text-gold mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-music"></i> Sasando Gong 11 Dawai Rote
+            </h3>
+            <div class="text-sm text-wood-300 space-y-3 leading-relaxed max-h-[70vh] overflow-y-auto pr-1">
+                <p>Aplikasi ini mengimitasi instrumen **Sasando Gong** asli dari Rote, NTT. Anatomi visual dan nada disesuaikan persis dengan instrumen 11 senar pentatonik tradisional.</p>
+                <h4 class="font-bold text-wood-100 mt-2">Daftar 11 Dawai & Nada Pentatonik:</h4>
+                <div class="grid grid-cols-2 gap-1.5 text-xs font-mono bg-wood-800/60 p-2.5 rounded-xl border border-wood-700">
+                    <div>1. Sol Low (G3) - [Tombol 1]</div>
+                    <div>2. Do (C4) - [Tombol 2]</div>
+                    <div>3. Re (D4) - [Tombol 3]</div>
+                    <div>4. Mi (E4) - [Tombol 4]</div>
+                    <div>5. Sol (G4) - [Tombol 5]</div>
+                    <div>6. La (A4) - [Tombol 6]</div>
+                    <div>7. Do' (C5) - [Tombol 7]</div>
+                    <div>8. Re' (D5) - [Tombol 8]</div>
+                    <div>9. Mi' (E5) - [Tombol 9]</div>
+                    <div>10. Sol' (G5) - [Tombol 0]</div>
+                    <div>11. La' (A5) - [Tombol -]</div>
+                </div>
+                <h4 class="font-bold text-wood-100 mt-2">Cara Memainkan:</h4>
+                <ul class="list-disc list-inside space-y-1 pl-1 text-xs">
+                    <li><strong class="text-gold">Petikan Langsung:</strong> Ketuk/klik pada garis dawai kawat atau kayu senda penyangga.</li>
+                    <li><strong class="text-gold">Strumming:</strong> Usap/geser jari atau mouse secara horizontal melintasi dawai.</li>
+                    <li><strong class="text-gold">Keyboard Desktop:</strong> Tekan angka <code class="bg-wood-800 text-gold px-1 rounded">1</code> hingga <code class="bg-wood-800 text-gold px-1 rounded">0</code> dan tombol <code class="bg-wood-800 text-gold px-1 rounded">-</code>.</li>
+                </ul>
+            </div>
+            <div class="mt-6 text-right">
+                <button onclick="toggleModal('modal-info')" class="bg-gold hover:bg-yellow-500 text-wood-900 font-bold px-5 py-2 rounded-xl text-sm transition">Mengerti</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Aplikasi Utama -->
+    <script>
+        // Data Sistem Laras 11 Dawai Sasando Gong (Pentatonik Rote / NTT)
+        const SASANDO_GONG_STRINGS = [
+            { id: 'G3', name: 'Sol (Low)', freq: 196.00, keyHint: '1', pos: 'left' },
+            { id: 'C4', name: 'Do', freq: 261.63, keyHint: '2', pos: 'left' },
+            { id: 'D4', name: 'Re', freq: 293.66, keyHint: '3', pos: 'left' },
+            { id: 'E4', name: 'Mi', freq: 329.63, keyHint: '4', pos: 'left' },
+            { id: 'G4', name: 'Sol', freq: 392.00, keyHint: '5', pos: 'left' },
+            { id: 'A4', name: 'La', freq: 440.00, keyHint: '6', pos: 'center' },
+            { id: 'C5', name: 'Do\'', freq: 523.25, keyHint: '7', pos: 'right' },
+            { id: 'D5', name: 'Re\'', freq: 587.33, keyHint: '8', pos: 'right' },
+            { id: 'E5', name: 'Mi\'', freq: 659.25, keyHint: '9', pos: 'right' },
+            { id: 'G5', name: 'Sol\'', freq: 783.99, keyHint: '0', pos: 'right' },
+            { id: 'A5', name: 'La\'', freq: 880.00, keyHint: '-', pos: 'right' }
+        ];
+
+        // Data Lagu Pembelajaran Sasando Gong
+        const SONGS_DATA = [
+            {
+                id: "bolelebo",
+                title: "Bolelebo",
+                origin: "Lagu Daerah Rote / NTT",
+                difficulty: "Sangat Mudah",
+                notes: ["C4", "E4", "G4", "G4", "A4", "G4", "E4", "D4", "C4"]
+            },
+            {
+                id: "anak_kambing",
+                title: "Anak Kambing Saya",
+                origin: "Nusa Tenggara Timur",
+                difficulty: "Mudah",
+                notes: ["C4", "C4", "E4", "E4", "G4", "G4", "E4", "C4", "D4", "E4", "G4", "D4", "C4"]
+            },
+            {
+                id: "potong_bebek",
+                title: "Potong Bebek Angsa",
+                origin: "Nusa Tenggara Timur",
+                difficulty: "Sedang",
+                notes: ["G4", "E4", "G4", "E4", "A4", "G4", "E4", "D4", "C4", "D4", "E4", "C4"]
+            }
+        ];
+
+        // State Aplikasi Global
+        let audioCtx = null;
+        let masterGain = null;
+        let reverbNode = null;
+        let isAudioInitialized = false;
+
+        // Parameter Suara Audio Synth Default
+        let audioParams = {
+            reverb: 0.55,
+            decay: 2.8,
+            brightness: 3200
+        };
+
+        // State Tutorial Pembelajaran
+        let currentLesson = null;
+        let lessonStep = 0;
+
+        // -------------------------------------------------------------
+        // 1. ENGINE SINTESIS SUARA KARPLUS-STRONG (Model Petik Sasando Gong)
+        // -------------------------------------------------------------
+        function initAudioEngine() {
+            if (isAudioInitialized) return;
+
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+
+                // Master Volume
+                masterGain = audioCtx.createGain();
+                masterGain.gain.setValueAtTime(0.75, audioCtx.currentTime);
+
+                // Reverb Impulse Response (Simulasi Resonansi Mangkok Lontar Haik)
+                reverbNode = audioCtx.createConvolver();
+                reverbNode.buffer = createHaikReverbImpulse(audioCtx, 2.8, 2.2);
+
+                const reverbGain = audioCtx.createGain();
+                reverbGain.gain.value = audioParams.reverb;
+
+                // Audio Routing
+                masterGain.connect(audioCtx.destination);
+                masterGain.connect(reverbNode);
+                reverbNode.connect(audioCtx.destination);
+
+                isAudioInitialized = true;
+                document.getElementById('audio-status-text').innerText = "Suara Aktif";
+                document.getElementById('btn-audio-init').classList.replace('bg-gold', 'bg-emerald-600');
+                document.getElementById('btn-audio-init').classList.replace('hover:bg-yellow-500', 'hover:bg-emerald-500');
+                document.getElementById('btn-audio-init').classList.add('text-white');
+            } catch (e) {
+                console.error("Web Audio API tidak didukung browser ini", e);
+            }
+        }
+
+        // Sintesis Impuls Impuls Resonansi Haik Lontar
+        function createHaikReverbImpulse(ctx, duration, decay) {
+            const sampleRate = ctx.sampleRate;
+            const length = sampleRate * duration;
+            const impulse = ctx.createBuffer(2, length, sampleRate);
+            const left = impulse.getChannelData(0);
+            const right = impulse.getChannelData(1);
+
+            for (let i = 0; i < length; i++) {
+                const n = length - i;
+                const damping = Math.pow(n / length, decay);
+                left[i] = (Math.random() * 2 - 1) * damping;
+                right[i] = (Math.random() * 2 - 1) * damping;
+            }
+            return impulse;
+        }
+
+        // Sintesis Suara Petikan Sasando Gong
+        function playSasandoNote(frequency) {
+            if (!isAudioInitialized) {
+                initAudioEngine();
+            }
+            if (!audioCtx) return;
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const startTime = audioCtx.currentTime;
+            const bufferSize = Math.round(audioCtx.sampleRate / frequency);
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+
+            // Initial Noise Pluck Burst
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+
+            const whiteNoise = audioCtx.createBufferSource();
+            whiteNoise.buffer = noiseBuffer;
+
+            // Lowpass Filter untuk simulasi dentang kawat kaku pada senda kayu
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(audioParams.brightness, startTime);
+
+            // Karplus-Strong Ring Delay Loop
+            const delay = audioCtx.createDelay();
+            delay.delayTime.setValueAtTime(1 / frequency, startTime);
+
+            const feedback = audioCtx.createGain();
+            const decayFactor = Math.min(0.996, 0.988 + (audioParams.decay / 1200));
+            feedback.gain.setValueAtTime(decayFactor, startTime);
+
+            // Resonator Bambu Sasando Gong
+            const bambooResonator = audioCtx.createBiquadFilter();
+            bambooResonator.type = 'peaking';
+            bambooResonator.frequency.setValueAtTime(650, startTime);
+            bambooResonator.Q.setValueAtTime(3.5, startTime);
+            bambooResonator.gain.setValueAtTime(8, startTime);
+
+            const noteGain = audioCtx.createGain();
+            noteGain.gain.setValueAtTime(0.85, startTime);
+            noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + audioParams.decay);
+
+            // Routing
+            whiteNoise.connect(filter);
+            filter.connect(delay);
+            delay.connect(feedback);
+            feedback.connect(delay);
+            delay.connect(bambooResonator);
+            bambooResonator.connect(noteGain);
+            noteGain.connect(masterGain);
+
+            whiteNoise.start(startTime);
+            whiteNoise.stop(startTime + 0.04);
+        }
+
+        // -------------------------------------------------------------
+        // 2. RENDER VISUAL SASANDO GONG (Berdasarkan Gambar Referensi)
+        // -------------------------------------------------------------
+        function renderSasando() {
+            const svg = document.getElementById('sasando-svg');
+            svg.innerHTML = '';
+
+            const width = 920;
+            const height = 650;
+            const centerX = width / 2;
+
+            // Definition Gradients
+            const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            defs.innerHTML = `
+                <!-- Gradient Daun Lontar Haik Bersih -->
+                <radialGradient id="haikRadial" cx="50%" cy="45%" r="55%">
+                    <stop offset="0%" stop-color="#EEDC9A" />
+                    <stop offset="65%" stop-color="#C29B47" />
+                    <stop offset="100%" stop-color="#6E501F" />
+                </radialGradient>
+                
+                <!-- Gradient Tabung Bambu Utama -->
+                <linearGradient id="bambooGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#2D1C12" />
+                    <stop offset="25%" stop-color="#734E2E" />
+                    <stop offset="50%" stop-color="#A67B4C" />
+                    <stop offset="75%" stop-color="#734E2E" />
+                    <stop offset="100%" stop-color="#2D1C12" />
+                </linearGradient>
+
+                <!-- Gradient Cincin Ornamen Bambu -->
+                <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#1A100A" />
+                    <stop offset="50%" stop-color="#3D291A" />
+                    <stop offset="100%" stop-color="#1A100A" />
+                </linearGradient>
+            `;
+            svg.appendChild(defs);
+
+            // 1. DOKUMEN VISUAL A: Wadah Haik Daun Lontar Polos & Bersih (Tanpa Garis-Garis Belakang)
+            const haikGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            
+            // Mangkok Utama Lontar (Polos tanpa pola serat/garis belakang)
+            const haikBowl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            const bowlPath = `M ${centerX} 120 
+                              C ${centerX - 410} 150, ${centerX - 430} 480, ${centerX} 590 
+                              C ${centerX + 430} 480, ${centerX + 410} 150, ${centerX} 120 Z`;
+            haikBowl.setAttribute("d", bowlPath);
+            haikBowl.setAttribute("fill", "url(#haikRadial)");
+            haikBowl.setAttribute("stroke", "#4E342E");
+            haikBowl.setAttribute("stroke-width", "4");
+            haikBowl.setAttribute("filter", "drop-shadow(0px 15px 25px rgba(0,0,0,0.6))");
+            haikGroup.appendChild(haikBowl);
+
+            // Mahkota Simpul Pita Lontar Atas
+            const topKnotGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            
+            const loopLeft = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            loopLeft.setAttribute("d", `M ${centerX} 110 C ${centerX - 80} 40, ${centerX - 40} 20, ${centerX} 80`);
+            loopLeft.setAttribute("fill", "#C29B47");
+            loopLeft.setAttribute("stroke", "#4E342E");
+            loopLeft.setAttribute("stroke-width", "3");
+
+            const loopRight = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            loopRight.setAttribute("d", `M ${centerX} 110 C ${centerX + 80} 40, ${centerX + 40} 20, ${centerX} 80`);
+            loopRight.setAttribute("fill", "#D8B86D");
+            loopRight.setAttribute("stroke", "#4E342E");
+            loopRight.setAttribute("stroke-width", "3");
+
+            const loopCenter = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            loopCenter.setAttribute("d", `M ${centerX} -30 C ${centerX - 30} 30, ${centerX + 30} 30, ${centerX} 100`);
+            loopCenter.setAttribute("fill", "#EEDC9A");
+            loopCenter.setAttribute("stroke", "#4E342E");
+            loopCenter.setAttribute("stroke-width", "3");
+
+            topKnotGroup.appendChild(loopLeft);
+            topKnotGroup.appendChild(loopRight);
+            topKnotGroup.appendChild(loopCenter);
+            haikGroup.appendChild(topKnotGroup);
+
+            // Dudukan Kayu Bawah (Base Mount)
+            const baseMount = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            baseMount.setAttribute("x", centerX - 55);
+            baseMount.setAttribute("y", 585);
+            baseMount.setAttribute("width", 110);
+            baseMount.setAttribute("height", 18);
+            baseMount.setAttribute("rx", 4);
+            baseMount.setAttribute("fill", "#4E342E");
+            baseMount.setAttribute("stroke", "#271B17");
+            baseMount.setAttribute("stroke-width", "2");
+            haikGroup.appendChild(baseMount);
+
+            svg.appendChild(haikGroup);
+
+            // 2. DOKUMEN VISUAL B: Tabung Bambu Resonansi Tengah
+            const bambooGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+            // Tabung Bambu Utama
+            const bambooTube = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            bambooTube.setAttribute("x", centerX - 48);
+            bambooTube.setAttribute("y", 140);
+            bambooTube.setAttribute("width", 96);
+            bambooTube.setAttribute("height", 430);
+            bambooTube.setAttribute("rx", 18);
+            bambooTube.setAttribute("fill", "url(#bambooGradient)");
+            bambooTube.setAttribute("stroke", "#1A100A");
+            bambooTube.setAttribute("stroke-width", "3");
+            bambooGroup.appendChild(bambooTube);
+
+            // Cincin Ornamen Bambu
+            const ringYPositions = [200, 310, 470];
+            ringYPositions.forEach(y => {
+                const ring = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                ring.setAttribute("x", centerX - 49);
+                ring.setAttribute("y", y);
+                ring.setAttribute("width", 98);
+                ring.setAttribute("height", 16);
+                ring.setAttribute("fill", "url(#ringGradient)");
+                ring.setAttribute("stroke", "#F5EBE1");
+                ring.setAttribute("stroke-width", "1.5");
+                bambooGroup.appendChild(ring);
+            });
+
+            // Kepala Mahkota Kayu Atas & Bawah
+            const topCap = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            topCap.setAttribute("d", `M ${centerX - 28} 140 L ${centerX} 105 L ${centerX + 28} 140 Z`);
+            topCap.setAttribute("fill", "#4E342E");
+            topCap.setAttribute("stroke", "#1A100A");
+            topCap.setAttribute("stroke-width", "2");
+            bambooGroup.appendChild(topCap);
+
+            const bottomCap = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            bottomCap.setAttribute("d", `M ${centerX - 28} 570 L ${centerX} 595 L ${centerX + 28} 570 Z`);
+            bottomCap.setAttribute("fill", "#4E342E");
+            bottomCap.setAttribute("stroke", "#1A100A");
+            bottomCap.setAttribute("stroke-width", "2");
+            bambooGroup.appendChild(bottomCap);
+
+            svg.appendChild(bambooGroup);
+
+            // 3. DOKUMEN VISUAL C: 11 Dawai Kawat Dengan Jarak Lebih Renyah & Area Sentuh Luas
+            const totalStrings = SASANDO_GONG_STRINGS.length;
+            const topY = 130;
+            const bottomY = 580;
+
+            SASANDO_GONG_STRINGS.forEach((note, index) => {
+                // Jarak antar dawai diperlebar secara merata agar tidak berdekatan/salah petik
+                const offsetFactor = (index - (totalStrings - 1) / 2); // -5 to +5
+                const xTop = centerX + (offsetFactor * 13);
+                const xBottom = centerX + (offsetFactor * 13);
+                
+                // Lengkungan Dawai Diperlebar
+                const xMidOffset = offsetFactor * 36;
+                const xMid = centerX + xMidOffset;
+
+                // Posisi Senda Bertingkat disebar vertikal
+                const ySenda = 180 + (index * 33);
+
+                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                g.setAttribute("class", "string-group cursor-pointer");
+                g.setAttribute("data-index", index);
+
+                // Path Garis Dawai Lengkung Visual
+                const stringPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                const pathData = `M ${xTop} ${topY} Q ${xMid} ${(topY + bottomY)/2} ${xBottom} ${bottomY}`;
+                stringPath.setAttribute("d", pathData);
+                stringPath.setAttribute("stroke", "#E5A93C");
+                stringPath.setAttribute("stroke-width", "2.5");
+                stringPath.setAttribute("fill", "none");
+                stringPath.setAttribute("id", `string-line-${index}`);
+                stringPath.setAttribute("class", "string-line");
+
+                // Hitbox Transparan DIPERLEBAR (42px) untuk Mencegah Salah Petik di Layar Sentuh
+                const touchHitbox = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                touchHitbox.setAttribute("d", pathData);
+                touchHitbox.setAttribute("stroke", "transparent");
+                touchHitbox.setAttribute("stroke-width", "42");
+                touchHitbox.setAttribute("fill", "none");
+
+                // Posisi Koordinat Senda pada Lengkungan Dawai
+                const t = (ySenda - topY) / (bottomY - topY);
+                const sendaX = (1 - t) * (1 - t) * xTop + 2 * (1 - t) * t * xMid + t * t * xBottom;
+
+                // Kayu Penyangga Senda (Ganjal Nada Kayu Segitiga)
+                const senda = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                const points = `${sendaX - 8},${ySenda + 6} ${sendaX + 8},${ySenda + 6} ${sendaX},${ySenda - 9}`;
+                senda.setAttribute("points", points);
+                senda.setAttribute("fill", "#E5A93C");
+                senda.setAttribute("stroke", "#3D291A");
+                senda.setAttribute("stroke-width", "1.5");
+                senda.setAttribute("id", `senda-${index}`);
+                senda.setAttribute("class", "senda-node");
+
+                // Label Notasi Solfege / Nada dengan Offset Selang-Seling Jauh Mencegah Tabrakan Teks
+                const labelBg = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                const labelXOffset = (index % 2 === 0) ? -32 : 32;
+                labelBg.setAttribute("cx", sendaX + labelXOffset);
+                labelBg.setAttribute("cy", ySenda);
+                labelBg.setAttribute("r", "13");
+                labelBg.setAttribute("fill", "#271B17");
+                labelBg.setAttribute("stroke", "#E5A93C");
+                labelBg.setAttribute("stroke-width", "1.5");
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", sendaX + labelXOffset);
+                text.setAttribute("y", ySenda + 4);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "#F5EBE1");
+                text.setAttribute("font-size", "10.5px");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = note.name.split(' ')[0];
+
+                // Event Listeners Petikan
+                g.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    triggerPluck(index);
+                });
+
+                g.appendChild(stringPath);
+                g.appendChild(touchHitbox);
+                g.appendChild(senda);
+                g.appendChild(labelBg);
+                g.appendChild(text);
+                svg.appendChild(g);
+            });
+
+            bindStrummingEvents();
+        }
+
+        // -------------------------------------------------------------
+        // 3. INTERAKSI TOUCH & STRUMMING EFEK
+        // -------------------------------------------------------------
+        let isPointerDown = false;
+        let lastPluckedIndex = -1;
+
+        function bindStrummingEvents() {
+            const svg = document.getElementById('sasando-svg');
+
+            svg.addEventListener('pointerdown', () => { isPointerDown = true; });
+            window.addEventListener('pointerup', () => { 
+                isPointerDown = false; 
+                lastPluckedIndex = -1;
+            });
+
+            svg.addEventListener('pointermove', (e) => {
+                if (!isPointerDown) return;
+                
+                const element = document.elementFromPoint(e.clientX, e.clientY);
+                if (!element) return;
+
+                const group = element.closest('.string-group');
+                if (group) {
+                    const index = parseInt(group.getAttribute('data-index'));
+                    if (index !== lastPluckedIndex && !isNaN(index)) {
+                        lastPluckedIndex = index;
+                        triggerPluck(index);
+                    }
+                }
+            });
+        }
+
+        // Trigger Petikan (Audio + Visual Animation)
+        function triggerPluck(index) {
+            const noteObj = SASANDO_GONG_STRINGS[index];
+            if (!noteObj) return;
+
+            // 1. Play Audio
+            playSasandoNote(noteObj.freq);
+
+            // 2. Visual Animation Feedbacks
+            const stringEl = document.getElementById(`string-line-${index}`);
+            const sendaEl = document.getElementById(`senda-${index}`);
+
+            if (stringEl) {
+                stringEl.classList.add('string-active');
+                setTimeout(() => {
+                    stringEl.classList.remove('string-active');
+                }, 180);
+            }
+
+            if (sendaEl) {
+                sendaEl.classList.add('senda-active');
+                setTimeout(() => {
+                    sendaEl.classList.remove('senda-active');
+                }, 180);
+            }
+
+            // 3. Status Display Update
+            document.getElementById('active-note-display').innerText = `${noteObj.name} (${noteObj.id})`;
+            document.getElementById('active-key-hint').innerText = `Tombol Keyboard: [${noteObj.keyHint}]`;
+
+            // 4. Verifikasi Step Tutorial Pembelajaran
+            checkTutorialStep(noteObj.id);
+        }
+
+        // -------------------------------------------------------------
+        // 4. MODE PEMBELAJARAN LAGU (TUTORIAL MODE)
+        // -------------------------------------------------------------
+        function renderSongList() {
+            const container = document.getElementById('song-list-container');
+            container.innerHTML = '';
+
+            SONGS_DATA.forEach(song => {
+                const card = document.createElement('div');
+                card.id = `song-card-${song.id}`;
+                card.className = "song-card cursor-pointer p-2.5 rounded-xl border border-wood-700/60 bg-wood-800/40 hover:bg-wood-800 transition flex items-center justify-between group";
+                card.onclick = () => selectLesson(song.id);
+                card.innerHTML = `
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-semibold text-wood-100 group-hover:text-gold transition">${song.title}</h3>
+                        <p class="text-[11px] text-wood-300">${song.origin}</p>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-wood-700/60 text-gold border border-gold/30 font-medium">${song.difficulty}</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function selectLesson(songId) {
+            const song = SONGS_DATA.find(s => s.id === songId);
+            if (!song) return;
+
+            currentLesson = song;
+            lessonStep = 0;
+
+            document.querySelectorAll('.song-card').forEach(c => c.classList.remove('border-gold', 'bg-wood-800'));
+            const activeCard = document.getElementById(`song-card-${songId}`);
+            if (activeCard) {
+                activeCard.classList.add('border-gold', 'bg-wood-800');
+            }
+
+            const ctrl = document.getElementById('tutorial-controls');
+            ctrl.classList.remove('hidden');
+            ctrl.classList.add('flex');
+
+            updateTutorialUI();
+        }
+
+        function updateTutorialUI() {
+            if (!currentLesson) return;
+
+            const targetNoteId = currentLesson.notes[lessonStep];
+            const targetNoteObj = SASANDO_GONG_STRINGS.find(s => s.id === targetNoteId);
+
+            document.getElementById('tutorial-status').innerText = `Langkah ${lessonStep + 1} / ${currentLesson.notes.length}`;
+            document.getElementById('target-note-name').innerText = targetNoteObj ? `${targetNoteObj.name} (${targetNoteId})` : targetNoteId;
+            
+            const progress = ((lessonStep) / currentLesson.notes.length) * 100;
+            document.getElementById('tutorial-progress').style.width = `${progress}%`;
+
+            clearStringHighlights();
+            if (targetNoteObj) {
+                const targetIdx = SASANDO_GONG_STRINGS.indexOf(targetNoteObj);
+                const stringEl = document.getElementById(`string-line-${targetIdx}`);
+                if (stringEl) {
+                    stringEl.classList.add('string-active');
+                }
+            }
+        }
+
+        function checkTutorialStep(playedNoteId) {
+            if (!currentLesson) return;
+
+            const targetNoteId = currentLesson.notes[lessonStep];
+            if (playedNoteId === targetNoteId) {
+                lessonStep++;
+                if (lessonStep >= currentLesson.notes.length) {
+                    setTimeout(() => {
+                        showCompletionModal(currentLesson.title);
+                        stopLesson();
+                    }, 250);
+                } else {
+                    updateTutorialUI();
+                }
+            }
+        }
+
+        function showCompletionModal(songTitle) {
+            const modal = document.createElement('div');
+            modal.className = "fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4";
+            modal.innerHTML = `
+                <div class="bg-wood-900 border border-gold text-wood-100 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl">
+                    <i class="fa-solid fa-trophy text-gold text-5xl mb-3 animate-bounce"></i>
+                    <h3 class="text-xl font-bold text-gold">Luar Biasa!</h3>
+                    <p class="text-sm text-wood-300 my-3 leading-relaxed">Anda berhasil memainkan lagu <strong>${songTitle}</strong> dengan Sasando Gong 11 Dawai!</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="bg-gold hover:bg-yellow-500 text-wood-900 font-bold px-5 py-2 rounded-xl text-sm transition shadow-lg">Lanjut Latihan</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function stopLesson() {
+            currentLesson = null;
+            lessonStep = 0;
+            document.getElementById('tutorial-controls').classList.add('hidden');
+            document.querySelectorAll('.song-card').forEach(c => c.classList.remove('border-gold', 'bg-wood-800'));
+            clearStringHighlights();
+        }
+
+        function clearStringHighlights() {
+            document.querySelectorAll('.string-line').forEach(s => s.classList.remove('string-active'));
+        }
+
+        // -------------------------------------------------------------
+        // 5. AUDIO PARAMETERS & KEYBOARD EVENTS
+        // -------------------------------------------------------------
+        function updateAudioParam(param, value) {
+            audioParams[param] = parseFloat(value);
+            if (param === 'reverb') {
+                document.getElementById('val-reverb').innerText = `${value}%`;
+            } else if (param === 'decay') {
+                document.getElementById('val-decay').innerText = `${(value / 10).toFixed(1)}s`;
+            } else if (param === 'brightness') {
+                document.getElementById('val-brightness').innerText = `${value} Hz`;
+            }
+        }
+
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.toggle('hidden');
+            }
+        }
+
+        // Event Listener Keyboard Shortcut Desktop
+        window.addEventListener('keydown', (e) => {
+            if (e.repeat) return;
+            const key = e.key;
+            const stringIdx = SASANDO_GONG_STRINGS.findIndex(s => s.keyHint === key);
+            if (stringIdx !== -1) {
+                triggerPluck(stringIdx);
+            }
+        });
+
+        // Initial Load Event
+        window.onload = function() {
+            renderSongList();
+            renderSasando();
+            window.addEventListener('resize', renderSasando);
+        };
+    </script>
+</body>
+</html>
